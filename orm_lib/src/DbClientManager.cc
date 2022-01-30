@@ -71,7 +71,8 @@ void DbClientManager::createDbClients(
                             dbInfo.connectionInfo_,
                             ioloops[idx],
                             dbInfo.dbType_,
-                            dbInfo.connectionNumber_));
+                            dbInfo.connectionNumber_,
+                            dbInfo.autoBatch_));
                     if (dbInfo.timeout_ > 0.0)
                     {
                         c->setTimeout(dbInfo.timeout_);
@@ -88,8 +89,9 @@ void DbClientManager::createDbClients(
             {
 #if USE_POSTGRESQL
                 dbClientsMap_[dbInfo.name_] =
-                    drogon::orm::DbClient::newPgClient(
-                        dbInfo.connectionInfo_, dbInfo.connectionNumber_);
+                    drogon::orm::DbClient::newPgClient(dbInfo.connectionInfo_,
+                                                       dbInfo.connectionNumber_,
+                                                       dbInfo.autoBatch_);
                 if (dbInfo.timeout_ > 0.0)
                 {
                     dbClientsMap_[dbInfo.name_]->setTimeout(dbInfo.timeout_);
@@ -139,7 +141,8 @@ void DbClientManager::createDbClient(const std::string &dbType,
                                      const std::string &name,
                                      const bool isFast,
                                      const std::string &characterSet,
-                                     double timeout)
+                                     double timeout,
+                                     const bool autoBatch)
 {
     auto connStr =
         utils::formattedString("host=%s port=%u dbname=%s user=%s",
@@ -165,6 +168,7 @@ void DbClientManager::createDbClient(const std::string &dbType,
     info.isFast_ = isFast;
     info.name_ = name;
     info.timeout_ = timeout;
+    info.autoBatch_ = autoBatch;
 
     if (type == "postgresql")
     {
