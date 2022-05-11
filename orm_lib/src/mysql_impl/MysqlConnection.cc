@@ -51,6 +51,7 @@ MysqlConnection::MysqlConnection(trantor::EventLoop *loop,
     : DbConnection(loop),
       mysqlPtr_(std::shared_ptr<MYSQL>(new MYSQL, [](MYSQL *p) {
           mysql_close(p);
+          mysql_library_end();
           delete p;
       }))
 {
